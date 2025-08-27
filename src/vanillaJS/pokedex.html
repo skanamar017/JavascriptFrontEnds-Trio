@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokédex</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>🔥 Pokédex 🔥</h1>
+    <p>Discover all Pokémon species and their abilities</p>
+  </div>
+
+  <div class="navigation">
+    <a href="trainers.html" class="nav-button">👨‍🏫 Trainers</a>
+    <a href="pokedex.html" class="nav-button">📖 Pokédex</a>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-controls">
+      <label for="typeFilter">Filter by Type:</label>
+      <select id="typeFilter">
+        <option value="">All Types</option>
+      </select>
+      
+      <label for="searchFilter">Search:</label>
+      <input type="text" id="searchFilter" placeholder="Search Pokémon name...">
+      
+      <label for="sortBy">Sort by:</label>
+      <select id="sortBy">
+        <option value="pokedex_number">Pokédex Number</option>
+        <option value="name">Name</option>
+        <option value="base_hp">HP</option>
+        <option value="base_attack">Attack</option>
+        <option value="base_defense">Defense</option>
+        <option value="base_speed">Speed</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="pokemonCount" style="text-align: center; margin-bottom: 20px; font-weight: bold;"></div>
+  
+  <div id="loadingMessage" class="loading">Loading Pokédex...</div>
+  <div id="errorMessage" class="error" style="display: none;"></div>
+  
+  <div id="pokemonGrid" class="pokemon-grid"></div>
+
+  <script src="pokedex.js"></script>
+</body>
+</html>

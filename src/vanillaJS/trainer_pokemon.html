@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trainer's Pokémon</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <h1 id="trainerPokemonTitle">👨‍🏫 Trainer's Pokémon 🔥</h1>
+    <p>Manage Pokémon owned by the trainer</p>
+  </div>
+
+  <div class="navigation">
+    <a href="trainers.html" class="nav-button">👨‍🏫 Trainers</a>
+    <a href="pokedex.html" class="nav-button">📖 Pokédex</a>
+  </div>
+
+  <div class="content-section">
+    <div id="trainerHeader"></div>
+    <form id="addTPForm" class="inline-form">
+      <input type="number" id="pokemonId" placeholder="Pokémon ID" required>
+      <input type="text" id="nickname" placeholder="Nickname" required>
+      <input type="number" id="level" placeholder="Level" required>
+      <input type="number" id="currentHp" placeholder="Current HP" required>
+      <button type="submit">Add Pokémon</button>
+    </form>
+    <ul id="tpList"></ul>
+    <button onclick="window.location='trainers.html'">Back to Trainers</button>
+  </div>
+  <script src="trainer_pokemon.js"></script>
+</body>
+</html>

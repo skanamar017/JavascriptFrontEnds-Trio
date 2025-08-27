@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trainer Management</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>👨‍🏫 Trainer Management 👨‍🏫</h1>
+    <p>Manage all Pokémon trainers and their information</p>
+  </div>
+  
+  <div class="navigation">
+    <a href="trainers.html" class="nav-button">👨‍🏫 Trainers</a>
+    <a href="pokedex.html" class="nav-button">📖 Pokédex</a>
+  </div>
+  
+  <div class="content-section">
+    <form id="addTrainerForm" class="inline-form">
+      <input type="text" id="trainerName" placeholder="Name" required>
+      <input type="number" id="trainerAge" placeholder="Age" min="1">
+      <select id="trainerGender">
+        <option value="">Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="text" id="trainerOccupation" placeholder="Occupation">
+      <button type="submit">Add Trainer</button>
+    </form>
+    <ul id="trainersList"></ul>
+  </div>
+  <script src="trainers.js"></script>
+</body>
+</html>
