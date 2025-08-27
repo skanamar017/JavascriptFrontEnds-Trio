@@ -1,4 +1,4 @@
-const apiBase = "http://127.0.0.1:5000";
+const apiBase = "http://127.0.0.1:5001";
 const trainersList = document.getElementById('trainersList');
 const addTrainerForm = document.getElementById('addTrainerForm');
 

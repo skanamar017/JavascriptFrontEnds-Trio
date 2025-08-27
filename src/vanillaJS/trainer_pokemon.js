@@ -1,4 +1,4 @@
-const apiBase = "http://127.0.0.1:5000";
+const apiBase = "http://127.0.0.1:5001";
 const urlParams = new URLSearchParams(window.location.search);
 const trainerId = urlParams.get('trainerId');
 const tpList = document.getElementById('tpList');
@@ -35,17 +35,120 @@ function fetchTrainerPokemon() {
         tpList.appendChild(li);
         return;
       }
-      tpArr.forEach(tp => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span style="cursor:pointer; color: #1976d2; text-decoration: underline;" onclick="viewPokemonDetails(${tp.id}, ${tp.pokemon_id})">${tp.nickname} (Level: ${tp.level}, HP: ${tp.current_hp})</span>`;
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.onclick = () => editTP(tp);
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'Delete';
-        delBtn.onclick = () => deleteTP(tp.id);
-        li.append(editBtn, delBtn);
-        tpList.appendChild(li);
+      
+      // Fetch detailed stats for each Pokemon
+      Promise.all(tpArr.map(tp => 
+        fetch(`${apiBase}/Trainers/${trainerId}/TrainerPokemon/${tp.id}/stats`)
+          .then(res => res.json())
+          .catch(err => {
+            console.error('Error fetching stats for Pokemon', tp.id, err);
+            return tp; // Fallback to basic data
+          })
+      )).then(detailedPokemon => {
+        detailedPokemon.forEach(pokemon => {
+          const li = document.createElement('li');
+          
+          // Create a more detailed display with stats
+          const pokemonInfo = document.createElement('div');
+          pokemonInfo.className = 'pokemon-info-card';
+          
+          const basicInfo = document.createElement('div');
+          basicInfo.className = 'pokemon-basic-info';
+          basicInfo.innerHTML = `
+            <h4 style="color: #1976d2; cursor: pointer; text-decoration: underline;" 
+                onclick="viewPokemonDetails(${pokemon.id}, ${pokemon.pokemon_id})">
+              ${pokemon.nickname || pokemon.pokemon_name || 'Unknown'} 
+              <span style="color: #666;">(${pokemon.pokemon_name || 'Unknown Species'})</span>
+            </h4>
+            <p><strong>Level:</strong> ${pokemon.level}</p>
+            <p><strong>Types:</strong> ${pokemon.type1}${pokemon.type2 ? ' / ' + pokemon.type2 : ''}</p>
+          `;
+          
+          // Display calculated stats if available
+          if (pokemon.calculated_stats) {
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'pokemon-stats-display';
+            statsDiv.innerHTML = `
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0;">
+                <div class="stat-item">
+                  <strong>HP:</strong> ${pokemon.calculated_stats.hp}/${pokemon.calculated_stats.hp}
+                </div>
+                <div class="stat-item">
+                  <strong>Attack:</strong> ${pokemon.calculated_stats.attack}
+                </div>
+                <div class="stat-item">
+                  <strong>Defense:</strong> ${pokemon.calculated_stats.defense}
+                </div>
+                <div class="stat-item">
+                  <strong>Speed:</strong> ${pokemon.calculated_stats.speed}
+                </div>
+                <div class="stat-item">
+                  <strong>Special:</strong> ${pokemon.calculated_stats.special}
+                </div>
+              </div>
+            `;
+            pokemonInfo.appendChild(statsDiv);
+          }
+          
+          // Display IVs
+          const ivsDiv = document.createElement('div');
+          ivsDiv.className = 'pokemon-ivs';
+          ivsDiv.innerHTML = `
+            <details>
+              <summary><strong>Individual Values (IVs)</strong></summary>
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 5px;">
+                <span>ATK: ${pokemon.iv_attack || 0}/15</span>
+                <span>DEF: ${pokemon.iv_defense || 0}/15</span>
+                <span>SPD: ${pokemon.iv_speed || 0}/15</span>
+                <span>SPC: ${pokemon.iv_special || 0}/15</span>
+              </div>
+            </details>
+          `;
+          
+          // Display EVs
+          const evsDiv = document.createElement('div');
+          evsDiv.className = 'pokemon-evs';
+          evsDiv.innerHTML = `
+            <details>
+              <summary><strong>Effort Values (EVs)</strong></summary>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 5px; font-size: 0.9em;">
+                <span>HP: ${pokemon.ev_hp || 0}</span>
+                <span>ATK: ${pokemon.ev_attack || 0}</span>
+                <span>DEF: ${pokemon.ev_defense || 0}</span>
+                <span>SPD: ${pokemon.ev_speed || 0}</span>
+                <span>SPC: ${pokemon.ev_special || 0}</span>
+              </div>
+            </details>
+          `;
+          
+          pokemonInfo.appendChild(basicInfo);
+          pokemonInfo.appendChild(ivsDiv);
+          pokemonInfo.appendChild(evsDiv);
+          
+          // Action buttons
+          const buttonDiv = document.createElement('div');
+          buttonDiv.style.marginTop = '10px';
+          
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Edit';
+          editBtn.onclick = () => editTP(pokemon);
+          
+          const trainBtn = document.createElement('button');
+          trainBtn.textContent = 'Train';
+          trainBtn.className = 'pokemon-button';
+          trainBtn.onclick = () => openTrainingModal(pokemon);
+          
+          const delBtn = document.createElement('button');
+          delBtn.textContent = 'Delete';
+          delBtn.style.backgroundColor = '#e74c3c';
+          delBtn.onclick = () => deleteTP(pokemon.id);
+          
+          buttonDiv.append(editBtn, trainBtn, delBtn);
+          pokemonInfo.appendChild(buttonDiv);
+          
+          li.appendChild(pokemonInfo);
+          tpList.appendChild(li);
+        });
       });
     });
 }
@@ -55,26 +158,57 @@ addTPForm.addEventListener('submit', e => {
   const pokemon_id = document.getElementById('pokemonId').value;
   const nickname = document.getElementById('nickname').value;
   const level = document.getElementById('level').value;
-  const current_hp = document.getElementById('currentHp').value;
+  
+  // Get IV values (optional - if not provided or 0, random IVs will be generated)
+  const iv_attack = parseInt(document.getElementById('ivAttack').value) || 0;
+  const iv_defense = parseInt(document.getElementById('ivDefense').value) || 0;
+  const iv_speed = parseInt(document.getElementById('ivSpeed').value) || 0;
+  const iv_special = parseInt(document.getElementById('ivSpecial').value) || 0;
+  
+  const pokemonData = {
+    trainer_id: trainerId,
+    pokemon_id: pokemon_id,
+    nickname: nickname,
+    level: level,
+    iv_attack: iv_attack,
+    iv_defense: iv_defense,
+    iv_speed: iv_speed,
+    iv_special: iv_special,
+    // EVs start at 0
+    ev_hp: 0,
+    ev_attack: 0,
+    ev_defense: 0,
+    ev_speed: 0,
+    ev_special: 0
+  };
+  
   fetch(`${apiBase}/Trainers/${trainerId}/TrainerPokemon/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ trainer_id: trainerId, pokemon_id, nickname, level, current_hp })
-  }).then(() => {
-    fetchTrainerPokemon();
-    addTPForm.reset();
+    body: JSON.stringify(pokemonData)
+  }).then(res => res.json())
+  .then(result => {
+    if (result.error) {
+      alert('Error adding Pokémon: ' + result.error);
+    } else {
+      fetchTrainerPokemon();
+      addTPForm.reset();
+    }
+  })
+  .catch(err => {
+    console.error('Error:', err);
+    alert('Failed to add Pokémon');
   });
 });
 
 function editTP(tp) {
   const nickname = prompt("Edit nickname:", tp.nickname);
   const level = prompt("Edit level:", tp.level);
-  const current_hp = prompt("Edit HP:", tp.current_hp);
-  if (!nickname || !level || !current_hp) return;
+  if (!nickname || !level) return;
   fetch(`${apiBase}/Trainers/${trainerId}/TrainerPokemon/${tp.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ trainer_id: trainerId, pokemon_id: tp.pokemon_id, nickname, level, current_hp })
+    body: JSON.stringify({ trainer_id: trainerId, pokemon_id: tp.pokemon_id, nickname, level })
   }).then(fetchTrainerPokemon);
 }
 
@@ -87,6 +221,79 @@ function deleteTP(tpId) {
 
 function viewPokemonDetails(tpId, pokemonId) {
   window.location = `trainer_pokemon_details.html?trainerId=${trainerId}&tpId=${tpId}&pokemonId=${pokemonId}`;
+}
+
+function openTrainingModal(pokemon) {
+  // Create a simple training modal
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  `;
+  
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    background: white; padding: 20px; border-radius: 10px; max-width: 400px; width: 90%;
+  `;
+  
+  modalContent.innerHTML = `
+    <h3>Train ${pokemon.nickname || pokemon.pokemon_name}</h3>
+    <p>Add EVs to improve stats:</p>
+    <form id="trainingForm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+        <label>HP EVs: <input type="number" id="evHp" min="0" max="1000" value="0"></label>
+        <label>Attack EVs: <input type="number" id="evAttack" min="0" max="1000" value="0"></label>
+        <label>Defense EVs: <input type="number" id="evDefense" min="0" max="1000" value="0"></label>
+        <label>Speed EVs: <input type="number" id="evSpeed" min="0" max="1000" value="0"></label>
+        <label>Special EVs: <input type="number" id="evSpecial" min="0" max="1000" value="0"></label>
+      </div>
+      <div style="text-align: right; margin-top: 15px;">
+        <button type="button" onclick="this.closest('.modal').remove()" style="margin-right: 10px;">Cancel</button>
+        <button type="submit" class="pokemon-button">Start Training</button>
+      </div>
+    </form>
+  `;
+  
+  modal.className = 'modal';
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+  
+  // Handle training form submission
+  document.getElementById('trainingForm').onsubmit = (e) => {
+    e.preventDefault();
+    const evGains = {
+      hp: parseInt(document.getElementById('evHp').value) || 0,
+      attack: parseInt(document.getElementById('evAttack').value) || 0,
+      defense: parseInt(document.getElementById('evDefense').value) || 0,
+      speed: parseInt(document.getElementById('evSpeed').value) || 0,
+      special: parseInt(document.getElementById('evSpecial').value) || 0
+    };
+    
+    trainPokemon(pokemon.id, evGains);
+    modal.remove();
+  };
+}
+
+function trainPokemon(tpId, evGains) {
+  fetch(`${apiBase}/trainer_pokemon/${tpId}/train`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ev_gains: evGains })
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.message) {
+      alert(result.message);
+      fetchTrainerPokemon(); // Refresh the list to show updated stats
+    } else {
+      alert('Training failed: ' + (result.error || 'Unknown error'));
+    }
+  })
+  .catch(err => {
+    console.error('Training error:', err);
+    alert('Training failed due to network error');
+  });
 }
 
 fetchTrainerInfo();

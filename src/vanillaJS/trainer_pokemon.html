@@ -18,13 +18,28 @@
 
   <div class="content-section">
     <div id="trainerHeader"></div>
+    
+    <h3>Add New Pokémon</h3>
     <form id="addTPForm" class="inline-form">
-      <input type="number" id="pokemonId" placeholder="Pokémon ID" required>
-      <input type="text" id="nickname" placeholder="Nickname" required>
-      <input type="number" id="level" placeholder="Level" required>
-      <input type="number" id="currentHp" placeholder="Current HP" required>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+        <input type="number" id="pokemonId" placeholder="Pokémon ID" required>
+        <input type="text" id="nickname" placeholder="Nickname" required>
+        <input type="number" id="level" placeholder="Level" required min="1" max="100">
+      </div>
+      
+      <details>
+        <summary><strong>Individual Values (IVs) - Optional (0-15)</strong></summary>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0;">
+          <input type="number" id="ivAttack" placeholder="Attack IV" min="0" max="15" value="0">
+          <input type="number" id="ivDefense" placeholder="Defense IV" min="0" max="15" value="0">
+          <input type="number" id="ivSpeed" placeholder="Speed IV" min="0" max="15" value="0">
+          <input type="number" id="ivSpecial" placeholder="Special IV" min="0" max="15" value="0">
+        </div>
+      </details>
+      
       <button type="submit">Add Pokémon</button>
     </form>
+    
     <ul id="tpList"></ul>
     <button onclick="window.location='trainers.html'">Back to Trainers</button>
   </div>
