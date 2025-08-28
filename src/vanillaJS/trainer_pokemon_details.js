@@ -14,7 +14,6 @@ function fetchPokemonDetails() {
       pokemonInfo.innerHTML = `
         <h2>${tp.nickname || 'Unnamed'}</h2>
         <p><strong>Level:</strong> ${tp.level}</p>
-        <p><strong>Current HP:</strong> ${tp.current_hp}</p>
         <p><strong>Trainer ID:</strong> ${tp.trainer_id}</p>
         <p><strong>Pokémon Species ID:</strong> ${tp.pokemon_id}</p>
       `;

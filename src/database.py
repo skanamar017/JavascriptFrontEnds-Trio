@@ -225,9 +225,9 @@ class PokemonDatabase:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """UPDATE TrainerPokemon 
-                   SET trainer_id = ?, pokemon_id = ?, nickname = ?, level = ?, current_hp = ?
+                   SET trainer_id = ?, pokemon_id = ?, nickname = ?, level = ?,
                    WHERE id = ?""",
-                (tp.trainer_id, tp.pokemon_id, tp.nickname, tp.level, tp.current_hp, tp_id)
+                (tp.trainer_id, tp.pokemon_id, tp.nickname, tp.level, tp_id)
             )
             if conn.total_changes == 0:
                 return None
