@@ -64,7 +64,9 @@ function fetchTrainerPokemon() {
             <p><strong>Types:</strong> ${pokemon.type1}${pokemon.type2 ? ' / ' + pokemon.type2 : ''}</p>
           `;
           
-          // Display calculated stats if available
+          pokemonInfo.appendChild(basicInfo);
+          
+          // Display calculated stats if available - moved to right after basic info
           if (pokemon.calculated_stats) {
             const statsDiv = document.createElement('div');
             statsDiv.className = 'pokemon-stats-display';
@@ -121,7 +123,6 @@ function fetchTrainerPokemon() {
             </details>
           `;
           
-          pokemonInfo.appendChild(basicInfo);
           pokemonInfo.appendChild(ivsDiv);
           pokemonInfo.appendChild(evsDiv);
           
