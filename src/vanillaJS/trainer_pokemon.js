@@ -133,17 +133,12 @@ function fetchTrainerPokemon() {
           editBtn.textContent = 'Edit';
           editBtn.onclick = () => editTP(pokemon);
           
-          const trainBtn = document.createElement('button');
-          trainBtn.textContent = 'Train';
-          trainBtn.className = 'pokemon-button';
-          trainBtn.onclick = () => openTrainingModal(pokemon);
-          
           const delBtn = document.createElement('button');
           delBtn.textContent = 'Delete';
           delBtn.style.backgroundColor = '#e74c3c';
           delBtn.onclick = () => deleteTP(pokemon.id);
           
-          buttonDiv.append(editBtn, trainBtn, delBtn);
+          buttonDiv.append(editBtn, delBtn);
           pokemonInfo.appendChild(buttonDiv);
           
           li.appendChild(pokemonInfo);
@@ -221,79 +216,6 @@ function deleteTP(tpId) {
 
 function viewPokemonDetails(tpId, pokemonId) {
   window.location = `trainer_pokemon_details.html?trainerId=${trainerId}&tpId=${tpId}&pokemonId=${pokemonId}`;
-}
-
-function openTrainingModal(pokemon) {
-  // Create a simple training modal
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-    z-index: 1000;
-  `;
-  
-  const modalContent = document.createElement('div');
-  modalContent.style.cssText = `
-    background: white; padding: 20px; border-radius: 10px; max-width: 400px; width: 90%;
-  `;
-  
-  modalContent.innerHTML = `
-    <h3>Train ${pokemon.nickname || pokemon.pokemon_name}</h3>
-    <p>Add EVs to improve stats:</p>
-    <form id="trainingForm">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
-        <label>HP EVs: <input type="number" id="evHp" min="0" max="1000" value="0"></label>
-        <label>Attack EVs: <input type="number" id="evAttack" min="0" max="1000" value="0"></label>
-        <label>Defense EVs: <input type="number" id="evDefense" min="0" max="1000" value="0"></label>
-        <label>Speed EVs: <input type="number" id="evSpeed" min="0" max="1000" value="0"></label>
-        <label>Special EVs: <input type="number" id="evSpecial" min="0" max="1000" value="0"></label>
-      </div>
-      <div style="text-align: right; margin-top: 15px;">
-        <button type="button" onclick="this.closest('.modal').remove()" style="margin-right: 10px;">Cancel</button>
-        <button type="submit" class="pokemon-button">Start Training</button>
-      </div>
-    </form>
-  `;
-  
-  modal.className = 'modal';
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-  
-  // Handle training form submission
-  document.getElementById('trainingForm').onsubmit = (e) => {
-    e.preventDefault();
-    const evGains = {
-      hp: parseInt(document.getElementById('evHp').value) || 0,
-      attack: parseInt(document.getElementById('evAttack').value) || 0,
-      defense: parseInt(document.getElementById('evDefense').value) || 0,
-      speed: parseInt(document.getElementById('evSpeed').value) || 0,
-      special: parseInt(document.getElementById('evSpecial').value) || 0
-    };
-    
-    trainPokemon(pokemon.id, evGains);
-    modal.remove();
-  };
-}
-
-function trainPokemon(tpId, evGains) {
-  fetch(`${apiBase}/trainer_pokemon/${tpId}/train`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ev_gains: evGains })
-  })
-  .then(res => res.json())
-  .then(result => {
-    if (result.message) {
-      alert(result.message);
-      fetchTrainerPokemon(); // Refresh the list to show updated stats
-    } else {
-      alert('Training failed: ' + (result.error || 'Unknown error'));
-    }
-  })
-  .catch(err => {
-    console.error('Training error:', err);
-    alert('Training failed due to network error');
-  });
 }
 
 fetchTrainerInfo();

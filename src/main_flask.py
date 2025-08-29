@@ -114,23 +114,6 @@ def delete_trainer_pokemon(trainer_id, tp_id):
         return jsonify({"message": "TrainerPokemon deleted successfully"}), 200
     return jsonify({"error": "TrainerPokemon not found"}), 404
 
-@app.route("/trainer_pokemon/<int:tp_id>/train", methods=["POST"])
-def train_pokemon_route(tp_id: int):
-    """Update a Pokémon's EVs (training)"""
-    data = request.get_json()
-    if not data or 'ev_gains' not in data:
-        return jsonify({"error": "ev_gains required in request body"}), 400
-    
-    success = db.update_trainer_pokemon_evs(tp_id, data['ev_gains'])
-    if success:
-        # Return updated stats
-        updated_details = db.get_trainer_pokemon_with_stats(tp_id)
-        return jsonify({
-            "message": "Training successful!",
-            "updated_pokemon": updated_details
-        }), 200
-    return jsonify({"error": "Training failed"}), 400
-
 @app.route("/Pokemon/", methods=["GET"])
 def get_all_pokemon():
     # Optional: filter by query param, e.g., ?type=Fire
