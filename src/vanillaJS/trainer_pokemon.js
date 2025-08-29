@@ -154,21 +154,12 @@ addTPForm.addEventListener('submit', e => {
   const nickname = document.getElementById('nickname').value;
   const level = document.getElementById('level').value;
   
-  // Get IV values (optional - if not provided or 0, random IVs will be generated)
-  const iv_attack = parseInt(document.getElementById('ivAttack').value) || 0;
-  const iv_defense = parseInt(document.getElementById('ivDefense').value) || 0;
-  const iv_speed = parseInt(document.getElementById('ivSpeed').value) || 0;
-  const iv_special = parseInt(document.getElementById('ivSpecial').value) || 0;
-  
   const pokemonData = {
     trainer_id: trainerId,
     pokemon_id: pokemon_id,
     nickname: nickname,
     level: level,
-    iv_attack: iv_attack,
-    iv_defense: iv_defense,
-    iv_speed: iv_speed,
-    iv_special: iv_special,
+    // Remove all IV fields - let backend generate random IVs
     // EVs start at 0
     ev_hp: 0,
     ev_attack: 0,
