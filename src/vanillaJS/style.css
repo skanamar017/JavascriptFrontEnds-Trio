@@ -33,10 +33,6 @@ body {
   display: inline-block;
 }
 
-.nav-button:hover {
-  background: #2980b9;
-}
-
 /* Common container styles */
 .content-section {
   background: white;
@@ -92,9 +88,6 @@ body {
   cursor: pointer;
 }
 
-.inline-form button:hover {
-  background: #45a049;
-}
 
 /* Button styles */
 button {
@@ -107,10 +100,6 @@ button {
   color: white;
 }
 
-button:hover {
-  background: #2980b9;
-}
-
 .pokemon-button {
   background: #4CAF50;
   color: white;
@@ -120,9 +109,7 @@ button:hover {
   cursor: pointer;
 }
 
-.pokemon-button:hover {
-  background: #45a049;
-}
+
 
 /* List styles */
 ul {
@@ -180,10 +167,6 @@ li {
   margin-right: 8px;
 }
 
-.clickable-trainer:hover {
-  color: #1565c0;
-}
-
 /* Pokemon Grid Styles */
 .pokemon-grid {
   display: grid;
@@ -198,12 +181,8 @@ li {
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s;
-  cursor: pointer;
-}
-
-.pokemon-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  cursor: default !important;
+  pointer-events: auto;
 }
 
 .pokemon-header {
@@ -369,10 +348,6 @@ li {
   cursor: pointer;
   font-weight: bold;
   color: #3498db;
-}
-
-.pokemon-ivs summary:hover, .pokemon-evs summary:hover {
-  color: #2980b9;
 }
 
 /* Training Modal Styles */

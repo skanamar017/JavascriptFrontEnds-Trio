@@ -126,7 +126,9 @@ function displayPokemon() {
 function createPokemonCard(pokemon) {
     const card = document.createElement('div');
     card.className = 'pokemon-card';
-    card.onclick = () => showPokemonDetails(pokemon);
+    
+    // Disable any pointer events if you want completely non-interactive cards
+    card.style.pointerEvents = 'none';
     
     const types = [pokemon.type1, pokemon.type2].filter(type => type);
     const typeBadges = types.map(type => 
@@ -170,108 +172,6 @@ function createPokemonCard(pokemon) {
     `;
     
     return card;
-}
-
-function showPokemonDetails(pokemon) {
-    // Create a modal or detailed view
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    `;
-    
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        max-width: 500px;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-    `;
-    
-    const types = [pokemon.type1, pokemon.type2].filter(type => type);
-    const typeBadges = types.map(type => 
-        `<span class="type-badge type-${type.toLowerCase()}">${type}</span>`
-    ).join('');
-    
-    modalContent.innerHTML = `
-        <button onclick="this.closest('.modal').remove()" style="
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 18px;
-        ">×</button>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h2>${pokemon.name}</h2>
-            <div style="background: #e74c3c; color: white; padding: 5px 15px; border-radius: 20px; display: inline-block;">
-                Pokédex #${pokemon.pokedex_number}
-            </div>
-        </div>
-        
-        <div style="margin: 20px 0; text-align: center;">
-            ${typeBadges}
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
-            <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                <div style="font-weight: bold; color: #e74c3c;">HP</div>
-                <div style="font-size: 1.5em; font-weight: bold;">${pokemon.base_hp}</div>
-            </div>
-            <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                <div style="font-weight: bold; color: #e74c3c;">Attack</div>
-                <div style="font-size: 1.5em; font-weight: bold;">${pokemon.base_attack}</div>
-            </div>
-            <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                <div style="font-weight: bold; color: #e74c3c;">Defense</div>
-                <div style="font-size: 1.5em; font-weight: bold;">${pokemon.base_defense}</div>
-            </div>
-            <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                <div style="font-weight: bold; color: #e74c3c;">Speed</div>
-                <div style="font-size: 1.5em; font-weight: bold;">${pokemon.base_speed}</div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin: 15px 0;">
-            <div style="font-weight: bold; color: #e74c3c;">Special</div>
-            <div style="font-size: 1.5em; font-weight: bold;">${pokemon.base_special}</div>
-        </div>
-        
-        ${pokemon.entry ? `
-            <div style="margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 10px; border-left: 4px solid #27ae60;">
-                <h4 style="margin: 0 0 10px 0; color: #27ae60;">Description</h4>
-                <p style="margin: 0; font-style: italic; line-height: 1.5;">"${pokemon.entry}"</p>
-            </div>
-        ` : ''}
-    `;
-    
-    modal.className = 'modal';
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
 }
 
 function showLoading(show) {
