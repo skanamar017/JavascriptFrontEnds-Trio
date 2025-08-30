@@ -85,6 +85,9 @@ const confirmDelete = async () => {
 
         <!-- Action buttons -->
         <div class="card-actions">
+          <RouterLink :to="`/trainer/${trainer.id}/pokemon`" class="btn btn-info btn-small">
+            Pokemon
+          </RouterLink>
           <RouterLink :to="`/edit-trainer/${trainer.id}`" class="btn btn-secondary btn-small">
             Edit
           </RouterLink>
@@ -244,6 +247,15 @@ const confirmDelete = async () => {
 
 .btn-danger:hover:not(:disabled) {
   background-color: #c82333;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+  background-color: #138496;
 }
 
 .btn-outline {

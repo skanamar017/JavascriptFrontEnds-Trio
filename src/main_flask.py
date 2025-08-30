@@ -1,32 +1,22 @@
 # Combined Trainer and Pokémon info endpoint
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from database import PokemonDatabase, Trainer, TrainerPokemon
 from typing import List
 import json
 import sqlite3
 from flask_cors import CORS
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Simple CORS configuration - REMOVE the complex one
+CORS(app)
+
 db = PokemonDatabase()
 
-
 @app.route("/", methods=["GET"])
-def read_root():
-    return jsonify({"message": "Welcome to the Simple User API!"})
-
-
-@app.route("/Trainers/<int:trainer_id>/WithPokemon", methods=["GET"])
-def get_trainer_with_pokemon(trainer_id):
-    trainer = db.get_trainer(trainer_id)
-    if not trainer:
-        return jsonify({"error": "Trainer not found"}), 404
-    tps = db.get_trainer_pokemons_by_trainer_id(trainer_id)
-    return jsonify({
-        "trainer": trainer.model_dump(),
-        "pokemon": [tp.model_dump() for tp in tps]
-    }), 200
-
+def home():
+    return {"message": "Pokemon Trainer API"}
 
 # Trainer Endpoints
 @app.route("/Trainers/", methods=["POST"])
@@ -69,13 +59,24 @@ def delete_trainer(trainer_id):
 # TrainerPokemon Endpoints
 @app.route("/Trainers/<int:trainer_id>/TrainerPokemon/", methods=["POST"])
 def create_trainer_pokemon(trainer_id):
-    data = request.get_json()
-    tp = TrainerPokemon(**data)
     try:
+        data = request.get_json()
+        print(f"[DEBUG] Creating Pokemon for trainer {trainer_id} with data: {data}")
+        
+        # Ensure trainer_id is set in the data
+        data['trainer_id'] = trainer_id
+        
+        # Create TrainerPokemon object
+        tp = TrainerPokemon(**data)
         created = db.create_trainer_pokemon(tp)
-        return jsonify(created.model_dump()), 200
+        
+        print(f"[DEBUG] Successfully created Pokemon: {created}")
+        return jsonify(created.model_dump()), 201
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        print(f"[ERROR] Failed to create Pokemon: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/Trainers/<int:trainer_id>/TrainerPokemon/<int:tp_id>", methods=["GET"])
 def get_trainer_pokemon(trainer_id, tp_id):

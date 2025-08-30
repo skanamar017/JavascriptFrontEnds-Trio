@@ -64,6 +64,19 @@ class ApiService {
     })
   }
 
+  async updateTrainerPokemon(trainerId, pokemonId, pokemonData) {
+    return this.request(`/Trainers/${trainerId}/TrainerPokemon/${pokemonId}`, {
+      method: 'PUT',
+      body: JSON.stringify(pokemonData),
+    })
+  }
+
+  async deleteTrainerPokemon(trainerId, pokemonId) {
+    return this.request(`/Trainers/${trainerId}/TrainerPokemon/${pokemonId}`, {
+      method: 'DELETE',
+    })
+  }
+
   async getTrainerWithPokemon(trainerId) {
     return this.request(`/Trainers/${trainerId}/WithPokemon`)
   }
