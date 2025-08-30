@@ -78,6 +78,23 @@ export const useTrainersStore = defineStore('trainers', {
       }
     },
 
+    // Delete trainer
+    async deleteTrainer(id) {
+      this.loading = true
+      this.error = null
+      
+      try {
+        await ApiService.deleteTrainer(id)
+        // Remove trainer from local state
+        this.trainers = this.trainers.filter(trainer => trainer.id !== id)
+      } catch (error) {
+        this.error = 'Failed to delete trainer: ' + error.message
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
     // Clear error
     clearError() {
       this.error = null

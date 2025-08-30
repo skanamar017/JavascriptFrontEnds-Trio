@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from "vue";
+import { onMounted, computed, ref } from "vue";
 import { useTrainersStore } from "@/stores/trainers";
 import { RouterLink } from "vue-router";
 
@@ -10,6 +10,11 @@ const trainers = computed(() => trainersStore.trainers);
 const loading = computed(() => trainersStore.loading);
 const error = computed(() => trainersStore.error);
 
+// Delete confirmation state
+const showDeleteConfirm = ref(false);
+const trainerToDelete = ref(null);
+const isDeleting = ref(false);
+
 // Fetch trainers when component mounts
 onMounted(async () => {
   await trainersStore.fetchAllTrainers();
@@ -18,6 +23,37 @@ onMounted(async () => {
 // Helper function to clear errors
 const clearError = () => {
   trainersStore.clearError();
+};
+
+// Show delete confirmation dialog
+const showDeleteConfirmation = (trainer) => {
+  trainerToDelete.value = trainer;
+  showDeleteConfirm.value = true;
+};
+
+// Cancel delete operation
+const cancelDelete = () => {
+  showDeleteConfirm.value = false;
+  trainerToDelete.value = null;
+};
+
+// Confirm and execute delete
+const confirmDelete = async () => {
+  if (!trainerToDelete.value) return;
+
+  isDeleting.value = true;
+
+  try {
+    await trainersStore.deleteTrainer(trainerToDelete.value.id);
+    // Refresh the trainers list
+    await trainersStore.fetchAllTrainers();
+  } catch (error) {
+    console.error("Failed to delete trainer:", error);
+  } finally {
+    isDeleting.value = false;
+    showDeleteConfirm.value = false;
+    trainerToDelete.value = null;
+  }
 };
 </script>
 
@@ -52,6 +88,13 @@ const clearError = () => {
           <RouterLink :to="`/edit-trainer/${trainer.id}`" class="btn btn-secondary btn-small">
             Edit
           </RouterLink>
+          <button
+            @click="showDeleteConfirmation(trainer)"
+            class="btn btn-danger btn-small"
+            :disabled="isDeleting"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -59,6 +102,28 @@ const clearError = () => {
     <!-- Empty state -->
     <div v-if="!loading && !error && trainers.length === 0" class="empty">
       <p>No trainers found.</p>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteConfirm" class="modal-overlay" @click="cancelDelete">
+      <div class="modal-content" @click.stop>
+        <h3>Confirm Delete</h3>
+        <p>
+          Are you sure you want to delete <strong>{{ trainerToDelete?.name }}</strong
+          >?
+          <br />
+          <small>This action cannot be undone.</small>
+        </p>
+
+        <div class="modal-actions">
+          <button @click="confirmDelete" class="btn btn-danger" :disabled="isDeleting">
+            {{ isDeleting ? "Deleting..." : "Yes, Delete" }}
+          </button>
+          <button @click="cancelDelete" class="btn btn-outline" :disabled="isDeleting">
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -170,5 +235,75 @@ const clearError = () => {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.modal-content p {
+  margin: 0 0 25px 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.modal-content small {
+  color: #999;
+  font-style: italic;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.modal-actions .btn {
+  min-width: 100px;
 }
 </style>

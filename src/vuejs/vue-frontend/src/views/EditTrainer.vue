@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useTrainersStore } from "@/stores/trainers";
 import { useRouter, useRoute } from "vue-router";
+import ApiService from "@/services/api"; // Import ApiService directly
 
 const trainersStore = useTrainersStore();
 const router = useRouter();
@@ -29,8 +30,8 @@ onMounted(async () => {
     isLoading.value = true;
     error.value = null;
 
-    // Fetch the specific trainer
-    trainer.value = await trainersStore.api.getTrainer(trainerId);
+    // Fetch the specific trainer using ApiService directly
+    trainer.value = await ApiService.getTrainer(trainerId);
 
     // Populate form with trainer data
     formData.value = {
@@ -75,8 +76,8 @@ const submitForm = async () => {
       trainerData.occupation = formData.value.occupation.trim();
     }
 
-    // Update the trainer
-    await trainersStore.updateTrainer(trainerId, trainerData);
+    // Update the trainer using ApiService directly
+    await ApiService.updateTrainer(trainerId, trainerData);
 
     // Refresh the trainers list
     await trainersStore.fetchAllTrainers();
