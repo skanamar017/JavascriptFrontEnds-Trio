@@ -221,6 +221,22 @@
   background: #c0392b;
 }
 
+.pokemon-button {
+  background: #9b59b6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.pokemon-button:hover {
+  background: #8e44ad;
+}
+
 /* Edit Form Styles */
 .edit-form {
   width: 100%;
@@ -280,5 +296,6 @@
   
   .trainer-actions {
     flex-direction: column;
+    gap: 8px;
   }
 }

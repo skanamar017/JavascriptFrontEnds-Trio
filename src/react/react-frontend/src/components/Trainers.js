@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { trainerAPI } from '../services/api';
 import './Trainers.css';
+import TrainerPokemon from './TrainerPokemon';
 
 function Trainers() {
   // State to hold the trainers data
@@ -27,6 +28,8 @@ function Trainers() {
     gender: '',
     occupation: ''
   });
+  // State for viewing Pokemon
+  const [viewingPokemon, setViewingPokemon] = useState(null);
 
   // useEffect runs when component mounts (loads)
   useEffect(() => {
@@ -404,6 +407,12 @@ function Trainers() {
                   </div>
                   <div className="trainer-actions">
                     <button 
+                      onClick={() => setViewingPokemon(trainer)}
+                      className="pokemon-button"
+                    >
+                      View Pokemon
+                    </button>
+                    <button 
                       onClick={() => startEditing(trainer)}
                       className="edit-button"
                     >
@@ -421,6 +430,13 @@ function Trainers() {
             </div>
           ))}
         </div>
+      )}
+
+      {viewingPokemon && (
+        <TrainerPokemon 
+          trainer={viewingPokemon} 
+          onBack={() => setViewingPokemon(null)} 
+        />
       )}
     </div>
   );
