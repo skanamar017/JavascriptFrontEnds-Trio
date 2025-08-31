@@ -226,8 +226,13 @@ class PokemonDatabase:
             conn.execute(
                 """UPDATE TrainerPokemon 
                    SET trainer_id = ?, pokemon_id = ?, nickname = ?, level = ?,
-                   WHERE id = ?""",
-                (tp.trainer_id, tp.pokemon_id, tp.nickname, tp.level, tp_id)
+                   iv_attack = ?, iv_defense = ?, iv_speed = ?, iv_special = ?,
+                   ev_hp = ?, ev_attack = ?, ev_defense = ?, ev_speed = ?, ev_special = ?
+               WHERE id = ?""",
+                (tp.trainer_id, tp.pokemon_id, tp.nickname, tp.level,
+                 tp.iv_attack, tp.iv_defense, tp.iv_speed, tp.iv_special,
+                 tp.ev_hp, tp.ev_attack, tp.ev_defense, tp.ev_speed, tp.ev_special,
+                 tp_id)
             )
             if conn.total_changes == 0:
                 return None

@@ -102,12 +102,37 @@ def get_trainer_pokemons(trainer_id):
 
 @app.route("/Trainers/<int:trainer_id>/TrainerPokemon/<int:tp_id>", methods=["PUT"])
 def update_trainer_pokemon(trainer_id, tp_id):
-    data = request.get_json()
-    tp = TrainerPokemon(**data)
-    updated = db.update_trainer_pokemon(tp_id, tp)
-    if updated:
-        return jsonify(updated.model_dump()), 200
-    return jsonify({"error": "TrainerPokemon not found"}), 404
+    try:
+        data = request.get_json()
+        print(f"[DEBUG] Updating Pokemon {tp_id} with data: {data}")
+        
+        # Get the existing trainer pokemon first
+        existing_tp = db.get_trainer_pokemon(tp_id)
+        if not existing_tp:
+            return jsonify({"error": "TrainerPokemon not found"}), 404
+        
+        # Update only the fields that are provided
+        update_data = existing_tp.model_dump()
+        if 'nickname' in data:
+            update_data['nickname'] = data['nickname']
+        if 'level' in data:
+            update_data['level'] = data['level']
+        
+        # Create updated TrainerPokemon object with all required fields
+        tp = TrainerPokemon(**update_data)
+        updated = db.update_trainer_pokemon(tp_id, tp)
+        
+        if updated:
+            print(f"[DEBUG] Successfully updated Pokemon: {updated}")
+            return jsonify(updated.model_dump()), 200
+        else:
+            return jsonify({"error": "Failed to update TrainerPokemon"}), 500
+            
+    except Exception as e:
+        print(f"[ERROR] Failed to update Pokemon: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/Trainers/<int:trainer_id>/TrainerPokemon/<int:tp_id>", methods=["DELETE"])
 def delete_trainer_pokemon(trainer_id, tp_id):
