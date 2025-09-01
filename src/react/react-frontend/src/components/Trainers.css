@@ -30,6 +30,10 @@
   transition: background 0.2s;
 }
 
+.add-trainer-button:hover {
+  background: #229954;
+}
+
 /* Trainer Form Styles */
 .trainer-form {
   background: white;
@@ -97,6 +101,10 @@
   transition: background 0.2s;
 }
 
+.submit-button:hover:not(:disabled) {
+  background: #2980b9;
+}
+
 .submit-button:disabled {
   background: #95a5a6;
   cursor: not-allowed;
@@ -114,6 +122,10 @@
   transition: background 0.2s;
 }
 
+.cancel-button:hover {
+  background: #c0392b;
+}
+
 /* Trainers Grid */
 .trainers-grid {
   display: grid;
@@ -128,6 +140,11 @@
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s;
+}
+
+.trainer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .trainer-card h3 {
@@ -160,6 +177,10 @@
   font-size: 14px;
 }
 
+.retry-button:hover {
+  background: #2980b9;
+}
+
 /* New Styles for Trainer Actions */
 .trainer-actions {
   margin-top: 15px;
@@ -180,6 +201,10 @@
   transition: background 0.2s;
 }
 
+.edit-button:hover {
+  background: #e67e22;
+}
+
 .delete-button {
   background: #e74c3c;
   color: white;
@@ -192,6 +217,10 @@
   transition: background 0.2s;
 }
 
+.delete-button:hover {
+  background: #c0392b;
+}
+
 .pokemon-button {
   background: #9b59b6;
   color: white;
@@ -202,6 +231,10 @@
   font-size: 12px;
   font-weight: 600;
   transition: background 0.2s;
+}
+
+.pokemon-button:hover {
+  background: #8e44ad;
 }
 
 /* Edit Form Styles */
