@@ -4,94 +4,76 @@ import ApiService from '@/services/api'
 export const useTrainersStore = defineStore('trainers', {
   state: () => ({
     trainers: [],
-    currentTrainer: null,
-    trainerPokemon: [],
     loading: false,
     error: null
   }),
 
-  getters: {
-    getTrainerById: (state) => (id) => {
-      return state.trainers.find(trainer => trainer.id === id)
-    },
-    
-    hasTrainers: (state) => state.trainers.length > 0
-  },
-
   actions: {
     // Fetch all trainers
-    async fetchAllTrainers() {
+    async fetchTrainers() {
       this.loading = true
       this.error = null
       
       try {
-        this.trainers = await ApiService.getAllTrainers()
+        const response = await ApiService.getAllTrainers()
+        this.trainers = response
       } catch (error) {
-        this.error = 'Failed to fetch trainers: ' + error.message
+        this.error = error.message || 'Failed to fetch trainers'
+        console.error('Error fetching trainers:', error)
       } finally {
         this.loading = false
       }
     },
 
-    // Fetch single trainer
-    async fetchTrainer(id) {
-      this.loading = true
-      this.error = null
-      
+    // Get single trainer
+    async getTrainer(id) {
       try {
-        this.currentTrainer = await ApiService.getTrainer(id)
+        return await ApiService.getTrainer(id)
       } catch (error) {
-        this.error = 'Failed to fetch trainer: ' + error.message
-      } finally {
-        this.loading = false
-      }
-    },
-
-    // Fetch trainer's Pokemon
-    async fetchTrainerPokemon(trainerId) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        this.trainerPokemon = await ApiService.getTrainerPokemon(trainerId)
-      } catch (error) {
-        this.error = 'Failed to fetch Pokemon: ' + error.message
-      } finally {
-        this.loading = false
+        this.error = error.message || 'Failed to fetch trainer'
+        console.error('Error fetching trainer:', error)
+        throw error
       }
     },
 
     // Create new trainer
     async createTrainer(trainerData) {
-      this.loading = true
-      this.error = null
-      
       try {
         const newTrainer = await ApiService.createTrainer(trainerData)
         this.trainers.push(newTrainer)
         return newTrainer
       } catch (error) {
-        this.error = 'Failed to create trainer: ' + error.message
+        this.error = error.message || 'Failed to create trainer'
+        console.error('Error creating trainer:', error)
         throw error
-      } finally {
-        this.loading = false
+      }
+    },
+
+    // Update trainer
+    async updateTrainer(id, trainerData) {
+      try {
+        const updatedTrainer = await ApiService.updateTrainer(id, trainerData)
+        const index = this.trainers.findIndex(trainer => trainer.id === id)
+        if (index !== -1) {
+          this.trainers[index] = updatedTrainer
+        }
+        return updatedTrainer
+      } catch (error) {
+        this.error = error.message || 'Failed to update trainer'
+        console.error('Error updating trainer:', error)
+        throw error
       }
     },
 
     // Delete trainer
     async deleteTrainer(id) {
-      this.loading = true
-      this.error = null
-      
       try {
         await ApiService.deleteTrainer(id)
-        // Remove trainer from local state
         this.trainers = this.trainers.filter(trainer => trainer.id !== id)
       } catch (error) {
-        this.error = 'Failed to delete trainer: ' + error.message
+        this.error = error.message || 'Failed to delete trainer'
+        console.error('Error deleting trainer:', error)
         throw error
-      } finally {
-        this.loading = false
       }
     },
 

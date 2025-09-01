@@ -1,42 +1,49 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TrainersList from '@/views/TrainersList.vue'
-import TrainerPokemon from '@/views/TrainerPokemon.vue'
+import TrainerDetail from '@/views/TrainerDetail.vue'
+import TrainerPokemonList from '@/views/TrainerPokemonList.vue'
+import PokemonDetail from '@/views/PokemonDetail.vue'
+import AddTrainer from '@/views/AddTrainer.vue'
 import AddPokemon from '@/views/AddPokemon.vue'
-import EditPokemon from '@/views/EditPokemon.vue'
-import EditTrainer from '@/views/EditTrainer.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Master List - All Trainers
     {
       path: '/',
-      name: 'home',
+      name: 'TrainersList',
       component: TrainersList
     },
-    {
-      path: '/trainers/:id/edit',
-      name: 'edit-trainer',
-      component: EditTrainer
-    },
-    {
-      path: '/trainers/:id/pokemon',
-      name: 'trainer-pokemon',
-      component: TrainerPokemon
-    },
-    {
-      path: '/trainers/:trainerId/pokemon/add',
-      name: 'add-pokemon',
-      component: AddPokemon
-    },
-    {
-      path: '/trainers/:trainerId/pokemon/:pokemonId/edit',
-      name: 'edit-pokemon',
-      component: EditPokemon
-    },
+    // Add Trainer
     {
       path: '/trainers/add',
       name: 'AddTrainer',
-      component: () => import('@/views/AddTrainer.vue')
+      component: AddTrainer
+    },
+    // Master Detail - Single Trainer
+    {
+      path: '/trainers/:id',
+      name: 'TrainerDetail',
+      component: TrainerDetail
+    },
+    // Detail List - Trainer's Pokemon
+    {
+      path: '/trainers/:id/pokemon',
+      name: 'TrainerPokemonList',
+      component: TrainerPokemonList
+    },
+    // Add Pokemon to Trainer
+    {
+      path: '/trainers/:id/pokemon/add',
+      name: 'AddPokemon',
+      component: AddPokemon
+    },
+    // Detail Detail - Single Pokemon
+    {
+      path: '/trainers/:id/pokemon/:pokemonId',
+      name: 'PokemonDetail',
+      component: PokemonDetail
     }
   ]
 })
