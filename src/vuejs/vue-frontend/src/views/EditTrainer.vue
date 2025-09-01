@@ -1,10 +1,14 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useTrainersStore } from "@/stores/trainers";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import ApiService from "@/services/api";
 
 const trainersStore = useTrainersStore();
 const router = useRouter();
+const route = useRoute();
+
+const trainerId = parseInt(route.params.id);
 
 // Form data
 const formData = ref({
@@ -14,13 +18,44 @@ const formData = ref({
   occupation: "",
 });
 
-// Form state
+// Component state
+const isLoading = ref(true);
 const isSubmitting = ref(false);
 const error = ref(null);
+const trainer = ref(null);
+
+// Load trainer data when component mounts
+onMounted(async () => {
+  console.log("Loading trainer with ID:", trainerId);
+
+  if (isNaN(trainerId)) {
+    error.value = "Invalid trainer ID";
+    isLoading.value = false;
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+    error.value = null;
+
+    trainer.value = await ApiService.getTrainer(trainerId);
+
+    formData.value = {
+      name: trainer.value.name || "",
+      age: trainer.value.age || null,
+      gender: trainer.value.gender || "",
+      occupation: trainer.value.occupation || "",
+    };
+  } catch (err) {
+    console.error("Failed to load trainer:", err);
+    error.value = "Failed to load trainer data";
+  } finally {
+    isLoading.value = false;
+  }
+});
 
 // Handle form submission
 const submitForm = async () => {
-  // Basic validation
   if (!formData.value.name.trim()) {
     error.value = "Name is required";
     return;
@@ -30,7 +65,6 @@ const submitForm = async () => {
   error.value = null;
 
   try {
-    // Create trainer object, only include non-empty fields
     const trainerData = {
       name: formData.value.name.trim(),
     };
@@ -47,41 +81,40 @@ const submitForm = async () => {
       trainerData.occupation = formData.value.occupation.trim();
     }
 
-    // Create the trainer
-    await trainersStore.createTrainer(trainerData);
-
-    // Redirect back to trainers list
+    await ApiService.updateTrainer(trainerId, trainerData);
+    await trainersStore.fetchAllTrainers();
     router.push("/");
   } catch (err) {
-    error.value = "Failed to create trainer. Please try again.";
+    console.error("Update failed:", err);
+    error.value = "Failed to update trainer. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
 };
 
-// Clear form
-const clearForm = () => {
-  formData.value = {
-    name: "",
-    age: null,
-    gender: "",
-    occupation: "",
-  };
-  error.value = null;
+const goBack = () => {
+  router.push("/");
 };
 </script>
 
 <template>
-  <div class="add-trainer">
+  <div class="edit-trainer">
+    <div class="page-header">
+      <button @click="goBack" class="btn btn-outline btn-small">← Back to Trainers</button>
+      <h1>Edit Trainer</h1>
+    </div>
+
     <div class="form-container">
-      <h1>Add New Trainer</h1>
+      <!-- Loading state -->
+      <div v-if="isLoading" class="loading">Loading trainer data...</div>
 
       <!-- Error message -->
       <div v-if="error" class="error">
         {{ error }}
       </div>
 
-      <form @submit.prevent="submitForm" class="trainer-form">
+      <!-- Edit form -->
+      <form v-if="!isLoading" @submit.prevent="submitForm" class="trainer-form">
         <!-- Name field (required) -->
         <div class="form-group">
           <label for="name">Name *</label>
@@ -135,24 +168,10 @@ const clearForm = () => {
         <!-- Form buttons -->
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-            {{ isSubmitting ? "Creating..." : "Create Trainer" }}
+            {{ isSubmitting ? "Updating..." : "Update Trainer" }}
           </button>
 
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="clearForm"
-            :disabled="isSubmitting"
-          >
-            Clear Form
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-outline"
-            @click="router.push('/')"
-            :disabled="isSubmitting"
-          >
+          <button type="button" class="btn btn-outline" @click="goBack" :disabled="isSubmitting">
             Cancel
           </button>
         </div>
@@ -162,10 +181,19 @@ const clearForm = () => {
 </template>
 
 <style scoped>
-.add-trainer {
+.edit-trainer {
   padding: 20px;
   max-width: 600px;
   margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  margin: 10px 0 0 0;
+  color: #333;
 }
 
 .form-container {
@@ -173,6 +201,12 @@ const clearForm = () => {
   border-radius: 8px;
   padding: 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
 }
 
 .trainer-form {
@@ -219,12 +253,19 @@ const clearForm = () => {
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
   transition: background-color 0.2s;
 }
 
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 12px;
 }
 
 .btn-primary {
@@ -234,15 +275,6 @@ const clearForm = () => {
 
 .btn-primary:hover:not(:disabled) {
   background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #545b62;
 }
 
 .btn-outline {

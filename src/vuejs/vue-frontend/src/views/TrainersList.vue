@@ -2,8 +2,6 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useTrainersStore } from "@/stores/trainers";
-import AddTrainer from "@/components/AddTrainer.vue";
-import EditTrainer from "@/components/EditTrainer.vue";
 
 const router = useRouter();
 const trainersStore = useTrainersStore();
@@ -12,10 +10,6 @@ const trainersStore = useTrainersStore();
 const trainers = computed(() => trainersStore.trainers);
 const loading = computed(() => trainersStore.loading);
 const error = computed(() => trainersStore.error);
-
-// Form state
-const showAddForm = ref(false);
-const editingTrainer = ref(null);
 
 // Delete confirmation
 const showDeleteConfirm = ref(false);
@@ -31,28 +25,14 @@ onMounted(async () => {
   }
 });
 
-// Show add form
+// Navigate to add trainer page
 const showAddTrainerForm = () => {
-  showAddForm.value = true;
-  editingTrainer.value = null;
+  router.push("/trainers/add");
 };
 
-// Show edit form
+// Navigate to edit trainer page
 const showEditTrainerForm = (trainer) => {
-  editingTrainer.value = trainer;
-  showAddForm.value = false;
-};
-
-// Close forms
-const closeForm = () => {
-  showAddForm.value = false;
-  editingTrainer.value = null;
-};
-
-// Handle successful form submission
-const handleFormSuccess = async () => {
-  await trainersStore.fetchAllTrainers();
-  closeForm();
+  router.push(`/trainers/${trainer.id}/edit`);
 };
 
 // Navigate to trainer's Pokemon
@@ -139,17 +119,6 @@ const confirmDelete = async () => {
         </div>
       </div>
     </div>
-
-    <!-- Add Trainer Form -->
-    <AddTrainer v-if="showAddForm" @close="closeForm" @success="handleFormSuccess" />
-
-    <!-- Edit Trainer Form -->
-    <EditTrainer
-      v-if="editingTrainer"
-      :trainer="editingTrainer"
-      @close="closeForm"
-      @success="handleFormSuccess"
-    />
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="modal-overlay" @click="cancelDelete">
@@ -273,6 +242,7 @@ const confirmDelete = async () => {
   display: flex;
   gap: 15px;
   justify-content: center;
+  margin-top: 20px;
 }
 
 /* Button styles */
@@ -303,14 +273,26 @@ const confirmDelete = async () => {
   color: white;
 }
 
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
 .btn-secondary {
   background-color: #6c757d;
   color: white;
 }
 
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
 .btn-danger {
   background-color: #dc3545;
   color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
 }
 
 .btn-outline {
@@ -319,8 +301,17 @@ const confirmDelete = async () => {
   border: 1px solid #007bff;
 }
 
+.btn-outline:hover:not(:disabled) {
+  background-color: #007bff;
+  color: white;
+}
+
 .btn-info {
   background-color: #17a2b8;
   color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+  background-color: #138496;
 }
 </style>
