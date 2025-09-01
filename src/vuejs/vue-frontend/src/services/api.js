@@ -1,85 +1,84 @@
-const BASE_URL = 'http://127.0.0.1:5001'
+const BASE_URL = 'http://localhost:5001'
 
 class ApiService {
-  // Helper method for making HTTP requests
-  async request(endpoint, options = {}) {
+  // Make a request with error handling using fetch
+  static async request(method, endpoint, data = null) {
     const url = `${BASE_URL}${endpoint}`
-    const config = {
+    const options = {
+      method,
       headers: {
         'Content-Type': 'application/json',
       },
-      ...options,
+    }
+
+    if (data) {
+      options.body = JSON.stringify(data)
     }
 
     try {
-      const response = await fetch(url, config)
+      console.log(`Making ${method} request to:`, url)
+      const response = await fetch(url, options)
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      return await response.json()
+      
+      const result = await response.json()
+      console.log('API response received:', result)
+      return result
     } catch (error) {
       console.error('API request failed:', error)
       throw error
     }
   }
 
-  // Trainer API methods
-  async getAllTrainers() {
-    return this.request('/Trainers/')
+  // Trainer methods
+  static async getAllTrainers() {
+    return this.request('GET', '/Trainers/')
   }
 
-  async getTrainer(id) {
-    return this.request(`/Trainers/${id}`)
+  static async getTrainer(id) {
+    return this.request('GET', `/Trainers/${id}`)
   }
 
-  async createTrainer(trainerData) {
-    return this.request('/Trainers/', {
-      method: 'POST',
-      body: JSON.stringify(trainerData),
-    })
+  static async createTrainer(trainerData) {
+    return this.request('POST', '/Trainers/', trainerData)
   }
 
-  async updateTrainer(id, trainerData) {
-    return this.request(`/Trainers/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(trainerData),
-    })
+  static async updateTrainer(id, trainerData) {
+    return this.request('PUT', `/Trainers/${id}`, trainerData)
   }
 
-  async deleteTrainer(id) {
-    return this.request(`/Trainers/${id}`, {
-      method: 'DELETE',
-    })
+  static async deleteTrainer(id) {
+    return this.request('DELETE', `/Trainers/${id}`)
   }
 
-  // Pokemon API methods
-  async getTrainerPokemon(trainerId) {
-    return this.request(`/Trainers/${trainerId}/TrainerPokemon/`)
+  // Pokemon methods
+  static async getAllPokemon(type = null) {
+    const endpoint = type ? `/Pokemon/?type=${type}` : '/Pokemon/'
+    return this.request('GET', endpoint)
   }
 
-  async createTrainerPokemon(trainerId, pokemonData) {
-    return this.request(`/Trainers/${trainerId}/TrainerPokemon/`, {
-      method: 'POST',
-      body: JSON.stringify(pokemonData),
-    })
+  // Trainer Pokemon methods
+  static async getTrainerPokemon(trainerId) {
+    return this.request('GET', `/Trainers/${trainerId}/TrainerPokemon/`)
   }
 
-  async updateTrainerPokemon(trainerId, pokemonId, pokemonData) {
-    return this.request(`/Trainers/${trainerId}/TrainerPokemon/${pokemonId}`, {
-      method: 'PUT',
-      body: JSON.stringify(pokemonData),
-    })
+  static async createTrainerPokemon(trainerId, pokemonData) {
+    return this.request('POST', `/Trainers/${trainerId}/TrainerPokemon/`, pokemonData)
   }
 
-  async deleteTrainerPokemon(trainerId, pokemonId) {
-    return this.request(`/Trainers/${trainerId}/TrainerPokemon/${pokemonId}`, {
-      method: 'DELETE',
-    })
+  static async getTrainerPokemonStats(trainerId, pokemonId) {
+    return this.request('GET', `/Trainers/${trainerId}/TrainerPokemon/${pokemonId}/stats`)
   }
 
-  async getTrainerWithPokemon(trainerId) {
-    return this.request(`/Trainers/${trainerId}/WithPokemon`)
+  static async updateTrainerPokemon(trainerId, pokemonId, pokemonData) {
+    return this.request('PUT', `/Trainers/${trainerId}/TrainerPokemon/${pokemonId}`, pokemonData)
+  }
+
+  static async deleteTrainerPokemon(trainerId, pokemonId) {
+    return this.request('DELETE', `/Trainers/${trainerId}/TrainerPokemon/${pokemonId}`)
   }
 }
 
-export default new ApiService()
+export default ApiService

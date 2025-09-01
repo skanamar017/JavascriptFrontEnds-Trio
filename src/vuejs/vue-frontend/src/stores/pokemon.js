@@ -3,57 +3,71 @@ import ApiService from '@/services/api'
 
 export const usePokemonStore = defineStore('pokemon', {
   state: () => ({
+    allPokemon: [],
     trainerPokemon: [],
-    currentPokemon: null,
     loading: false,
     error: null
   }),
 
-  getters: {
-    getPokemonByTrainerId: (state) => (trainerId) => {
-      return state.trainerPokemon.filter(pokemon => pokemon.trainer_id === trainerId)
-    },
-    
-    hasPokemon: (state) => state.trainerPokemon.length > 0
-  },
-
   actions: {
-    // Fetch Pokemon for a specific trainer
+    // Fetch all Pokemon for selection
+    async fetchAllPokemon() {
+      this.loading = true
+      this.error = null
+      
+      try {
+        console.log('Fetching all Pokemon...')
+        const response = await ApiService.getAllPokemon()
+        console.log('Received Pokemon data:', response)
+        
+        if (Array.isArray(response)) {
+          this.allPokemon = response
+          console.log('Set allPokemon to:', this.allPokemon.length, 'Pokemon')
+        } else {
+          console.error('Expected array but got:', typeof response, response)
+          this.error = 'Invalid Pokemon data received'
+          this.allPokemon = []
+        }
+      } catch (error) {
+        this.error = error.message || 'Failed to fetch Pokemon'
+        this.allPokemon = []
+        console.error('Error fetching Pokemon:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // Fetch trainer's Pokemon
     async fetchTrainerPokemon(trainerId) {
       this.loading = true
       this.error = null
       
       try {
-        this.trainerPokemon = await ApiService.getTrainerPokemon(trainerId)
+        const response = await ApiService.getTrainerPokemon(trainerId)
+        this.trainerPokemon = response
       } catch (error) {
-        this.error = 'Failed to fetch Pokemon: ' + error.message
+        this.error = error.message || 'Failed to fetch trainer Pokemon'
+        console.error('Error fetching trainer Pokemon:', error)
       } finally {
         this.loading = false
       }
     },
 
-    // Create new Pokemon for trainer
+    // Add Pokemon to trainer
     async createTrainerPokemon(trainerId, pokemonData) {
-      this.loading = true
-      this.error = null
-      
       try {
         const newPokemon = await ApiService.createTrainerPokemon(trainerId, pokemonData)
         this.trainerPokemon.push(newPokemon)
         return newPokemon
       } catch (error) {
-        this.error = 'Failed to add Pokemon: ' + error.message
+        this.error = error.message || 'Failed to add Pokemon'
+        console.error('Error adding Pokemon:', error)
         throw error
-      } finally {
-        this.loading = false
       }
     },
 
-    // Update Pokemon
+    // Update trainer Pokemon
     async updateTrainerPokemon(trainerId, pokemonId, pokemonData) {
-      this.loading = true
-      this.error = null
-      
       try {
         const updatedPokemon = await ApiService.updateTrainerPokemon(trainerId, pokemonId, pokemonData)
         const index = this.trainerPokemon.findIndex(p => p.id === pokemonId)
@@ -62,26 +76,21 @@ export const usePokemonStore = defineStore('pokemon', {
         }
         return updatedPokemon
       } catch (error) {
-        this.error = 'Failed to update Pokemon: ' + error.message
+        this.error = error.message || 'Failed to update Pokemon'
+        console.error('Error updating Pokemon:', error)
         throw error
-      } finally {
-        this.loading = false
       }
     },
 
-    // Delete Pokemon
+    // Delete trainer Pokemon
     async deleteTrainerPokemon(trainerId, pokemonId) {
-      this.loading = true
-      this.error = null
-      
       try {
         await ApiService.deleteTrainerPokemon(trainerId, pokemonId)
         this.trainerPokemon = this.trainerPokemon.filter(p => p.id !== pokemonId)
       } catch (error) {
-        this.error = 'Failed to delete Pokemon: ' + error.message
+        this.error = error.message || 'Failed to delete Pokemon'
+        console.error('Error deleting Pokemon:', error)
         throw error
-      } finally {
-        this.loading = false
       }
     },
 

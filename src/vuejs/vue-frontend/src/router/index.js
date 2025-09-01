@@ -25,25 +25,29 @@ const router = createRouter({
     {
       path: '/trainers/:id',
       name: 'TrainerDetail',
-      component: TrainerDetail
+      component: TrainerDetail,
+      props: true  // Pass route params as props
     },
     // Detail List - Trainer's Pokemon
     {
       path: '/trainers/:id/pokemon',
       name: 'TrainerPokemonList',
-      component: TrainerPokemonList
+      component: TrainerPokemonList,
+      props: true  // Pass route params as props
     },
     // Add Pokemon to Trainer
     {
       path: '/trainers/:id/pokemon/add',
       name: 'AddPokemon',
-      component: AddPokemon
+      component: AddPokemon,
+      props: true  // Pass route params as props
     },
     // Detail Detail - Single Pokemon
     {
       path: '/trainers/:id/pokemon/:pokemonId',
       name: 'PokemonDetail',
-      component: PokemonDetail
+      component: PokemonDetail,
+      props: true  // Pass route params as props
     }
   ]
 })
