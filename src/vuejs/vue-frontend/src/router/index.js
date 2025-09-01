@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TrainersList from '@/views/TrainersList.vue'
-import AddTrainer from '@/views/AddTrainer.vue'
-import EditTrainer from '@/views/EditTrainer.vue'
 import TrainerPokemon from '@/views/TrainerPokemon.vue'
 
 const router = createRouter({
@@ -13,17 +11,7 @@ const router = createRouter({
       component: TrainersList
     },
     {
-      path: '/add-trainer',
-      name: 'add-trainer',
-      component: AddTrainer
-    },
-    {
-      path: '/edit-trainer/:id',
-      name: 'edit-trainer',
-      component: EditTrainer
-    },
-    {
-      path: '/trainer/:id/pokemon',
+      path: '/trainers/:id/pokemon',
       name: 'trainer-pokemon',
       component: TrainerPokemon
     }

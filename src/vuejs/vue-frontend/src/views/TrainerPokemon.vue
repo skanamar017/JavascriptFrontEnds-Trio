@@ -212,31 +212,52 @@ const confirmDelete = async () => {
 
       <div v-else class="pokemon-grid">
         <div v-for="poke in pokemon" :key="poke.id" class="pokemon-card">
-          <h3>{{ poke.nickname }}</h3>
+          <!-- Pokemon Header with name and species -->
+          <div class="pokemon-header">
+            <h3>{{ poke.nickname || poke.pokemon_name }}</h3>
+            <p v-if="poke.nickname" class="pokemon-species">({{ poke.pokemon_name }})</p>
+          </div>
+
           <div class="pokemon-details">
-            <p><strong>Pokemon ID:</strong> {{ poke.pokemon_id }}</p>
             <p><strong>Level:</strong> {{ poke.level }}</p>
+            <p v-if="poke.type1">
+              <strong>Type:</strong> {{ poke.type1
+              }}<span v-if="poke.type2"> / {{ poke.type2 }}</span>
+            </p>
+          </div>
 
-            <div class="stats-section">
-              <h4>Individual Values (IVs)</h4>
-              <div class="stats-grid">
-                <span>HP: {{ poke.iv_hp }}</span>
-                <span>Attack: {{ poke.iv_attack }}</span>
-                <span>Defense: {{ poke.iv_defense }}</span>
-                <span>Special: {{ poke.iv_special }}</span>
-                <span>Speed: {{ poke.iv_speed }}</span>
-              </div>
+          <!-- Calculated Stats Section -->
+          <div v-if="poke.calculated_hp" class="stats-section">
+            <h4>Calculated Stats</h4>
+            <div class="stats-grid calculated-stats">
+              <span>HP: {{ poke.calculated_hp }}</span>
+              <span>ATK: {{ poke.calculated_attack }}</span>
+              <span>DEF: {{ poke.calculated_defense }}</span>
+              <span>SPD: {{ poke.calculated_speed }}</span>
+              <span>SPC: {{ poke.calculated_special }}</span>
             </div>
+          </div>
 
-            <div class="stats-section">
-              <h4>Effort Values (EVs)</h4>
-              <div class="stats-grid">
-                <span>HP: {{ poke.ev_hp }}</span>
-                <span>Attack: {{ poke.ev_attack }}</span>
-                <span>Defense: {{ poke.ev_defense }}</span>
-                <span>Special: {{ poke.ev_special }}</span>
-                <span>Speed: {{ poke.ev_speed }}</span>
-              </div>
+          <!-- IVs Section -->
+          <div class="stats-section">
+            <h4>Individual Values (IVs)</h4>
+            <div class="stats-grid">
+              <span>ATK: {{ poke.iv_attack }}</span>
+              <span>DEF: {{ poke.iv_defense }}</span>
+              <span>SPD: {{ poke.iv_speed }}</span>
+              <span>SPC: {{ poke.iv_special }}</span>
+            </div>
+          </div>
+
+          <!-- EVs Section (optional - you can remove if not needed) -->
+          <div class="stats-section">
+            <h4>Effort Values (EVs)</h4>
+            <div class="stats-grid">
+              <span>HP: {{ poke.ev_hp }}</span>
+              <span>ATK: {{ poke.ev_attack }}</span>
+              <span>DEF: {{ poke.ev_defense }}</span>
+              <span>SPD: {{ poke.ev_speed }}</span>
+              <span>SPC: {{ poke.ev_special }}</span>
             </div>
           </div>
 
@@ -493,10 +514,34 @@ const confirmDelete = async () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.pokemon-card h3 {
-  margin: 0 0 15px 0;
-  color: #333;
-  font-size: 1.3em;
+.pokemon-header {
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+.pokemon-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.4em;
+}
+
+.pokemon-species {
+  margin: 5px 0 0 0;
+  color: #7f8c8d;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.calculated-stats {
+  background-color: #e8f5e8;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.calculated-stats span {
+  color: #2d5a2d;
 }
 
 .pokemon-details p {
@@ -516,10 +561,18 @@ const confirmDelete = async () => {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
   gap: 8px;
   font-size: 0.85em;
   color: #666;
+}
+
+.stats-grid span {
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
 }
 
 .pokemon-actions {

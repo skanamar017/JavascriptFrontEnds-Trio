@@ -98,7 +98,8 @@ def get_trainer_pokemon_stats_route(trainer_id, tp_id):
 def get_trainer_pokemons(trainer_id):
     print(f"[DEBUG] get_trainer_pokemons called for trainer_id={trainer_id}")
     tps = db.get_trainer_pokemons_by_trainer_id(trainer_id)
-    return jsonify([tp.model_dump() for tp in tps]), 200
+    # Since tps is now a List[dict], we don't need .model_dump()
+    return jsonify(tps), 200
 
 @app.route("/Trainers/<int:trainer_id>/TrainerPokemon/<int:tp_id>", methods=["PUT"])
 def update_trainer_pokemon(trainer_id, tp_id):

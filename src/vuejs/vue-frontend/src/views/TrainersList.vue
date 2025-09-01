@@ -1,43 +1,78 @@
 <script setup>
-import { onMounted, computed, ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useTrainersStore } from "@/stores/trainers";
-import { RouterLink } from "vue-router";
+import AddTrainer from "@/components/AddTrainer.vue";
+import EditTrainer from "@/components/EditTrainer.vue";
 
+const router = useRouter();
 const trainersStore = useTrainersStore();
 
-// Computed properties for reactive data
+// Component state
 const trainers = computed(() => trainersStore.trainers);
 const loading = computed(() => trainersStore.loading);
 const error = computed(() => trainersStore.error);
 
-// Delete confirmation state
+// Form state
+const showAddForm = ref(false);
+const editingTrainer = ref(null);
+
+// Delete confirmation
 const showDeleteConfirm = ref(false);
 const trainerToDelete = ref(null);
 const isDeleting = ref(false);
 
-// Fetch trainers when component mounts
+// Load trainers data
 onMounted(async () => {
-  await trainersStore.fetchAllTrainers();
+  try {
+    await trainersStore.fetchAllTrainers();
+  } catch (err) {
+    console.error("Failed to load trainers:", err);
+  }
 });
 
-// Helper function to clear errors
-const clearError = () => {
-  trainersStore.clearError();
+// Show add form
+const showAddTrainerForm = () => {
+  showAddForm.value = true;
+  editingTrainer.value = null;
 };
 
-// Show delete confirmation dialog
+// Show edit form
+const showEditTrainerForm = (trainer) => {
+  editingTrainer.value = trainer;
+  showAddForm.value = false;
+};
+
+// Close forms
+const closeForm = () => {
+  showAddForm.value = false;
+  editingTrainer.value = null;
+};
+
+// Handle successful form submission
+const handleFormSuccess = async () => {
+  await trainersStore.fetchAllTrainers();
+  closeForm();
+};
+
+// Navigate to trainer's Pokemon
+const viewTrainerPokemon = (trainer) => {
+  router.push(`/trainers/${trainer.id}/pokemon`);
+};
+
+// Show delete confirmation
 const showDeleteConfirmation = (trainer) => {
   trainerToDelete.value = trainer;
   showDeleteConfirm.value = true;
 };
 
-// Cancel delete operation
+// Cancel delete
 const cancelDelete = () => {
   showDeleteConfirm.value = false;
   trainerToDelete.value = null;
 };
 
-// Confirm and execute delete
+// Confirm delete
 const confirmDelete = async () => {
   if (!trainerToDelete.value) return;
 
@@ -45,10 +80,9 @@ const confirmDelete = async () => {
 
   try {
     await trainersStore.deleteTrainer(trainerToDelete.value.id);
-    // Refresh the trainers list
     await trainersStore.fetchAllTrainers();
-  } catch (error) {
-    console.error("Failed to delete trainer:", error);
+  } catch (err) {
+    console.error("Failed to delete trainer:", err);
   } finally {
     isDeleting.value = false;
     showDeleteConfirm.value = false;
@@ -59,53 +93,63 @@ const confirmDelete = async () => {
 
 <template>
   <div class="trainers-list">
+    <!-- Header -->
     <div class="header-section">
-      <h1>Pokemon Trainers</h1>
-      <RouterLink to="/add-trainer" class="btn btn-primary"> + Add New Trainer </RouterLink>
+      <h1>Pokemon Trainers ({{ trainers.length }})</h1>
+      <button @click="showAddTrainerForm" class="btn btn-primary">+ Add New Trainer</button>
     </div>
 
-    <!-- Loading state -->
+    <!-- Loading -->
     <div v-if="loading" class="loading">Loading trainers...</div>
 
-    <!-- Error state -->
+    <!-- Error -->
     <div v-if="error" class="error">
       <p>{{ error }}</p>
-      <button @click="clearError" class="btn btn-small">Clear Error</button>
+      <button @click="trainersStore.clearError()" class="btn btn-small">Clear Error</button>
     </div>
 
-    <!-- Trainers list -->
-    <div v-if="!loading && !error" class="trainers-grid">
-      <div v-for="trainer in trainers" :key="trainer.id" class="trainer-card">
-        <h3>{{ trainer.name }}</h3>
-        <div class="trainer-details">
-          <p><strong>Age:</strong> {{ trainer.age || "Unknown" }}</p>
-          <p><strong>Gender:</strong> {{ trainer.gender || "Unknown" }}</p>
-          <p><strong>Occupation:</strong> {{ trainer.occupation || "Trainer" }}</p>
-        </div>
+    <!-- Trainers List -->
+    <div v-if="!loading && !error" class="trainers-section">
+      <div v-if="trainers.length === 0" class="empty">
+        <p>No trainers found. Add some trainers to get started!</p>
+        <button @click="showAddTrainerForm" class="btn btn-primary">Add First Trainer</button>
+      </div>
 
-        <!-- Action buttons -->
-        <div class="card-actions">
-          <RouterLink :to="`/trainer/${trainer.id}/pokemon`" class="btn btn-info btn-small">
-            Pokemon
-          </RouterLink>
-          <RouterLink :to="`/edit-trainer/${trainer.id}`" class="btn btn-secondary btn-small">
-            Edit
-          </RouterLink>
-          <button
-            @click="showDeleteConfirmation(trainer)"
-            class="btn btn-danger btn-small"
-            :disabled="isDeleting"
-          >
-            Delete
-          </button>
+      <div v-else class="trainers-grid">
+        <div v-for="trainer in trainers" :key="trainer.id" class="trainer-card">
+          <h3>{{ trainer.name }}</h3>
+
+          <div class="trainer-details">
+            <p v-if="trainer.age"><strong>Age:</strong> {{ trainer.age }}</p>
+            <p v-if="trainer.gender"><strong>Gender:</strong> {{ trainer.gender }}</p>
+            <p v-if="trainer.occupation"><strong>Occupation:</strong> {{ trainer.occupation }}</p>
+          </div>
+
+          <div class="trainer-actions">
+            <button @click="viewTrainerPokemon(trainer)" class="btn btn-info btn-small">
+              View Pokemon
+            </button>
+            <button @click="showEditTrainerForm(trainer)" class="btn btn-secondary btn-small">
+              Edit
+            </button>
+            <button @click="showDeleteConfirmation(trainer)" class="btn btn-danger btn-small">
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Empty state -->
-    <div v-if="!loading && !error && trainers.length === 0" class="empty">
-      <p>No trainers found.</p>
-    </div>
+    <!-- Add Trainer Form -->
+    <AddTrainer v-if="showAddForm" @close="closeForm" @success="handleFormSuccess" />
+
+    <!-- Edit Trainer Form -->
+    <EditTrainer
+      v-if="editingTrainer"
+      :trainer="editingTrainer"
+      @close="closeForm"
+      @success="handleFormSuccess"
+    />
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="modal-overlay" @click="cancelDelete">
@@ -115,7 +159,7 @@ const confirmDelete = async () => {
           Are you sure you want to delete <strong>{{ trainerToDelete?.name }}</strong
           >?
           <br />
-          <small>This action cannot be undone.</small>
+          <small>This will also delete all their Pokemon. This action cannot be undone.</small>
         </p>
 
         <div class="modal-actions">
@@ -142,11 +186,12 @@ const confirmDelete = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .header-section h1 {
   margin: 0;
+  color: #333;
 }
 
 .loading,
@@ -168,7 +213,6 @@ const confirmDelete = async () => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-  margin-top: 20px;
 }
 
 .trainer-card {
@@ -177,17 +221,11 @@ const confirmDelete = async () => {
   padding: 20px;
   background-color: #f9f9f9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.trainer-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .trainer-card h3 {
   margin: 0 0 15px 0;
-  color: #333;
+  color: #2c3e50;
   font-size: 1.4em;
 }
 
@@ -196,77 +234,14 @@ const confirmDelete = async () => {
   color: #666;
 }
 
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  display: inline-block;
-  transition: background-color 0.2s;
-}
-
-.btn-primary {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #218838;
-}
-
-.btn-small {
-  padding: 5px 15px;
-  font-size: 12px;
-}
-
-.card-actions {
+.trainer-actions {
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #eee;
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-.btn-info {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.btn-info:hover:not(:disabled) {
-  background-color: #138496;
-}
-
-.btn-outline {
-  background-color: transparent;
-  color: #007bff;
-  border: 1px solid #007bff;
-}
-
-.btn-outline:hover:not(:disabled) {
-  background-color: #007bff;
-  color: white;
+  flex-wrap: wrap;
 }
 
 /* Modal styles */
@@ -287,26 +262,11 @@ const confirmDelete = async () => {
   background: white;
   border-radius: 8px;
   padding: 30px;
-  max-width: 400px;
+  max-width: 500px;
   width: 90%;
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.modal-content h3 {
-  margin: 0 0 15px 0;
-  color: #333;
-}
-
-.modal-content p {
-  margin: 0 0 25px 0;
-  color: #666;
-  line-height: 1.5;
-}
-
-.modal-content small {
-  color: #999;
-  font-style: italic;
+  margin: 20px;
 }
 
 .modal-actions {
@@ -315,7 +275,52 @@ const confirmDelete = async () => {
   justify-content: center;
 }
 
-.modal-actions .btn {
-  min-width: 100px;
+/* Button styles */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 5px 15px;
+  font-size: 12px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: white;
 }
 </style>

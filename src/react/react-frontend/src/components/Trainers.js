@@ -224,7 +224,17 @@ function Trainers() {
     );
   }
 
-  // Render the trainers
+  // If viewing Pokemon, show only the TrainerPokemon component
+  if (viewingPokemon) {
+    return (
+      <TrainerPokemon 
+        trainer={viewingPokemon} 
+        onBack={() => setViewingPokemon(null)} 
+      />
+    );
+  }
+
+  // Otherwise, show the trainers list
   return (
     <div className="trainers-container">
       <div className="trainers-header">
@@ -430,13 +440,6 @@ function Trainers() {
             </div>
           ))}
         </div>
-      )}
-
-      {viewingPokemon && (
-        <TrainerPokemon 
-          trainer={viewingPokemon} 
-          onBack={() => setViewingPokemon(null)} 
-        />
       )}
     </div>
   );

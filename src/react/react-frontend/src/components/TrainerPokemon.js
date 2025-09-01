@@ -32,8 +32,10 @@ function TrainerPokemon({ trainer, onBack }) {
       setLoading(true);
       setError(null);
       
+      console.log('Fetching Pokemon for trainer:', trainer.id);
       const data = await trainerPokemonAPI.getTrainerPokemon(trainer.id);
-      console.log('Fetched trainer Pokemon:', data);
+      console.log('Raw API response:', data);
+      console.log('First Pokemon data:', data[0]); // Log the first Pokemon to see its structure
       
       setPokemon(data);
     } catch (err) {

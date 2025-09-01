@@ -212,12 +212,77 @@ class PokemonDatabase:
             rows = cursor.fetchall()
             return [TrainerPokemon(**dict(row)) for row in rows]
         
-    def get_trainer_pokemons_by_trainer_id(self, trainer_id: int) -> List[TrainerPokemon]:
+    def get_trainer_pokemons_by_trainer_id(self, trainer_id: int) -> List[dict]:
+        """Get trainer pokemon with species data and calculated stats"""
+        print(f"[DEBUG] Getting Pokemon for trainer {trainer_id}")
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
-            cursor = conn.execute("SELECT * FROM TrainerPokemon WHERE trainer_id = ?", (trainer_id,))
+            cursor = conn.execute("""
+                SELECT tp.*, p.name as pokemon_name, p.type1, p.type2,
+                       p.base_hp, p.base_attack, p.base_defense, p.base_speed, p.base_special
+                FROM TrainerPokemon tp
+                JOIN Pokemon p ON tp.pokemon_id = p.id
+                WHERE tp.trainer_id = ?
+            """, (trainer_id,))
             rows = cursor.fetchall()
-            return [TrainerPokemon(**dict(row)) for row in rows]
+            print(f"[DEBUG] Found {len(rows)} Pokemon for trainer {trainer_id}")
+            
+            result = []
+            for row in rows:
+                # Convert row to dict
+                pokemon_data = dict(row)
+                print(f"[DEBUG] Processing Pokemon: {pokemon_data}")
+                
+                # Calculate HP IV from other IVs (Gen 1 mechanic)
+                hp_iv = Gen1StatCalculator.calculate_hp_iv(
+                    pokemon_data['iv_attack'], pokemon_data['iv_defense'], 
+                    pokemon_data['iv_speed'], pokemon_data['iv_special']
+                )
+                
+                # Calculate actual stats
+                base_stats = {
+                    'hp': pokemon_data['base_hp'],
+                    'attack': pokemon_data['base_attack'],
+                    'defense': pokemon_data['base_defense'],
+                    'speed': pokemon_data['base_speed'],
+                    'special': pokemon_data['base_special']
+                }
+                
+                ivs = {
+                    'attack': pokemon_data['iv_attack'],
+                    'defense': pokemon_data['iv_defense'],
+                    'speed': pokemon_data['iv_speed'],
+                    'special': pokemon_data['iv_special']
+                }
+                
+                evs = {
+                    'hp': pokemon_data['ev_hp'],
+                    'attack': pokemon_data['ev_attack'],
+                    'defense': pokemon_data['ev_defense'],
+                    'speed': pokemon_data['ev_speed'],
+                    'special': pokemon_data['ev_special']
+                }
+                
+                # Calculate stats
+                calculated_stats = Gen1StatCalculator.calculate_all_stats(
+                    base_stats, pokemon_data['level'], ivs, evs
+                )
+                
+                # Add calculated stats to the data
+                pokemon_data['calculated_hp'] = calculated_stats.hp
+                pokemon_data['calculated_attack'] = calculated_stats.attack
+                pokemon_data['calculated_defense'] = calculated_stats.defense
+                pokemon_data['calculated_speed'] = calculated_stats.speed
+                pokemon_data['calculated_special'] = calculated_stats.special
+                
+                # Remove base stat fields (not needed in frontend)
+                for key in ['base_hp', 'base_attack', 'base_defense', 'base_speed', 'base_special']:
+                    pokemon_data.pop(key, None)
+                
+                result.append(pokemon_data)
+                
+            print(f"[DEBUG] Returning Pokemon data: {result}")
+            return result
 
 
 
