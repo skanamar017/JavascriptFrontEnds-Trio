@@ -273,19 +273,10 @@ const goBack = () => {
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
 .btn-outline {
   background-color: transparent;
   color: #007bff;
   border: 1px solid #007bff;
-}
-
-.btn-outline:hover:not(:disabled) {
-  background-color: #007bff;
-  color: white;
 }
 
 .error {

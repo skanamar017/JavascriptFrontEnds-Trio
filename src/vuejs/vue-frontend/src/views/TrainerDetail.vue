@@ -321,26 +321,14 @@ const goBack = () => {
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
 .btn-secondary {
   background-color: #6c757d;
   color: white;
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background-color: #5a6268;
-}
-
 .btn-danger {
   background-color: #dc3545;
   color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #c82333;
 }
 
 .btn-outline {
@@ -349,8 +337,4 @@ const goBack = () => {
   border: 1px solid #007bff;
 }
 
-.btn-outline:hover:not(:disabled) {
-  background-color: #007bff;
-  color: white;
-}
 </style>

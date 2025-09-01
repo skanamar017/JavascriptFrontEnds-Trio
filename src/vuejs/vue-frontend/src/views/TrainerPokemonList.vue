@@ -149,11 +149,6 @@ const goHome = () => {
   transition: all 0.3s ease;
 }
 
-.pokemon-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #007bff;
-}
-
 .pokemon-header h3 {
   margin: 0 0 5px 0;
   color: #007bff;
@@ -211,21 +206,6 @@ const goHome = () => {
 }
 
 .btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-outline {
-  background-color: transparent;
-  color: #007bff;
-  border: 1px solid #007bff;
-}
-
-.btn-outline:hover {
   background-color: #007bff;
   color: white;
 }
