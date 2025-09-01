@@ -32,6 +32,11 @@ const router = createRouter({
       path: '/trainers/:trainerId/pokemon/:pokemonId/edit',
       name: 'edit-pokemon',
       component: EditPokemon
+    },
+    {
+      path: '/trainers/add',
+      name: 'AddTrainer',
+      component: () => import('@/views/AddTrainer.vue')
     }
   ]
 })
