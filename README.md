@@ -1,3 +1,15 @@
+## Vanilla JS
+
+<img src="vanilla.png" alt="Description of image">
+
+## VueJS
+
+<img src="vueJS.png" alt="Description of image">
+
+## ReactJS
+
+<img src="react.png" alt="Description of image">
+
 # Week 8: JavaScript Front-End Development
 
 ## Assignment Overview
@@ -36,6 +48,7 @@ src/
 Each implementation must include:
 
 #### 1. Task Management Features
+
 - ✅ Create new tasks with title, description, and priority
 - ✅ View all tasks in a responsive list format
 - ✅ Mark tasks as complete/incomplete
@@ -44,6 +57,7 @@ Each implementation must include:
 - ✅ Filter tasks by status (All, Pending, Completed)
 
 #### 2. User Interface Requirements
+
 - ✅ Clean, professional design
 - ✅ Responsive layout (mobile-friendly)
 - ✅ Loading indicators during API operations
@@ -52,6 +66,7 @@ Each implementation must include:
 - ✅ Task statistics display (total, pending, completed counts)
 
 #### 3. Technical Requirements
+
 - ✅ Consume your existing REST API backend
 - ✅ Implement proper error handling for network failures
 - ✅ Use optimistic UI updates where appropriate
@@ -66,6 +81,7 @@ Each implementation must include:
 **Focus**: Fundamental web technologies and modern JavaScript
 
 **Requirements**:
+
 - Use ES6+ features (classes, arrow functions, async/await)
 - Implement modular code organization
 - Use Fetch API for HTTP requests
@@ -73,6 +89,7 @@ Each implementation must include:
 - Create reusable utility functions
 
 **File Structure**:
+
 ```
 src/vanillaJS/
 ├── index.html
@@ -87,6 +104,7 @@ src/vanillaJS/
 **Focus**: Reactive data binding and declarative templates
 
 **Requirements**:
+
 - Use Vue.js 3 (CDN or npm)
 - Implement reactive data properties
 - Use Vue directives (v-model, v-for, v-if, @click)
@@ -94,6 +112,7 @@ src/vanillaJS/
 - Utilize computed properties and watchers
 
 **File Structure**:
+
 ```
 src/vuejs/
 ├── index.html
@@ -107,6 +126,7 @@ src/vuejs/
 **Focus**: Modern React patterns with hooks and component composition
 
 **Requirements**:
+
 - Use functional components with React Hooks
 - Implement useState and useEffect properly
 - Create a component hierarchy with props/callbacks
@@ -114,6 +134,7 @@ src/vuejs/
 - Apply performance optimizations (React.memo, useCallback)
 
 **File Structure**:
+
 ```
 src/react/
 ├── public/
@@ -141,11 +162,13 @@ src/react/
 ## Development Process
 
 ### Phase 1: Planning and Setup
+
 1. Review your existing REST API endpoints
 2. Design the user interface mockup
 3. Plan the component structure for each implementation
 
 ### Phase 2: Vanilla JavaScript Implementation
+
 1. Create the HTML structure and CSS styles
 2. Implement API communication module
 3. Build core application logic
@@ -153,6 +176,7 @@ src/react/
 5. Test all CRUD operations
 
 ### Phase 3: Vue.js Implementation
+
 1. Set up Vue.js project structure
 2. Convert HTML to Vue templates
 3. Implement reactive data management
@@ -160,6 +184,7 @@ src/react/
 5. Add Vue-specific optimizations
 
 ### Phase 4: React Implementation
+
 1. Set up React development environment
 2. Create component hierarchy
 3. Implement state management with hooks
@@ -169,24 +194,28 @@ src/react/
 ## Evaluation Criteria
 
 ### Functionality (40%)
+
 - All CRUD operations work correctly
 - Proper API integration
 - Error handling and user feedback
 - Filter and search capabilities
 
 ### Code Quality (30%)
+
 - Clean, readable code with comments
 - Proper code organization and structure
 - Following framework-specific best practices
 - Performance considerations
 
 ### User Experience (20%)
+
 - Responsive design
 - Intuitive user interface
 - Loading states and error messages
 - Professional appearance
 
 ### Technical Implementation (10%)
+
 - Proper use of modern JavaScript features
 - Framework-specific patterns and concepts
 - API error handling
